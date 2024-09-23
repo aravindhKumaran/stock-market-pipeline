@@ -3,11 +3,15 @@ from airflow.hooks.base import BaseHook
 from airflow.sensors.base import PokeReturnValue
 from airflow.operators.python import PythonOperator
 from airflow.providers.docker.operators.docker import DockerOperator
+from airflow.models import TaskInstance
+from astro import sql as aql
+from astro.files import File
+from astro.sql.table import Table, Metadata
 
 from datetime import datetime 
 import requests 
 
-from include.stock_market.tasks import _get_stock_prices, _store_prices
+from include.stock_market.tasks import _get_stock_prices, _store_prices, _get_formatted_csv, BUCKET_NAME
 
 SYMBOL = "AAPL"
 
@@ -17,6 +21,7 @@ SYMBOL = "AAPL"
     catchup = False,
     tags = ['stock_market']
 )
+
 def stock_market():
     
     @task.sensor(poke_interval=30, timeout=300, mode='poke')
@@ -60,8 +65,31 @@ def stock_market():
             'SPARK_APPLICATION_ARGS': '{{ task_instance.xcom_pull(task_ids="store_prices") }}'
         }
     )
+
+    get_formatted_csv = PythonOperator(
+        task_id = 'get_formatted_csv',
+        python_callable = _get_formatted_csv,
+        op_kwargs = {
+            'path': '{{ task_instance.xcom_pull(task_ids="store_prices") }}'
+        }
+    )
+
+    load_to_dw = aql.load_file(
+        task_id = 'load_to_dw',
+        #input_file = File(path = f"s3://{BUCKET_NAME}/{{ task_instance.xcom_pull(task_ids='get_formatted_csv') }}", conn_id = 'minio'), 
+        input_file = File(
+            path = f"s3://{BUCKET_NAME}/{{{{ task_instance.xcom_pull(task_ids='get_formatted_csv') }}}}", 
+            conn_id='minio'
+        ),
+        output_table = Table(
+            name = 'stock_market',
+            conn_id = 'postgres',
+            metadata = Metadata(schema = 'public')
+        )
+    )
+
     
-    is_api_available() >> get_stock_prices >> store_prices >> format_prices
+    is_api_available() >> get_stock_prices >> store_prices >> format_prices >> get_formatted_csv >> load_to_dw
     
 
 stock_market()
