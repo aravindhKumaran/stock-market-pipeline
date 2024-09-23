@@ -41,9 +41,38 @@ Note: Running 'astro dev start' will start your project with the Airflow Webserv
 
 You should also be able to access your Postgres Database at 'localhost:5432/postgres'.
 
-Deploy Your Project to Astronomer
-=================================
+# Slack Notification Setup for Airflow
 
-If you have an Astronomer account, pushing code to a Deployment on Astronomer is simple. For deploying instructions, refer to Astronomer documentation: https://www.astronomer.io/docs/astro/deploy-code/
+## Steps to Create Slack Notifications
+
+1. **Visit the Slack API Page**
+   - Go to [Slack API](https://api.slack.com/).
+
+2. **Create a New Workspace**
+   - Follow the prompts to create a new Slack workspace.
+
+3. **Create an App from Scratch**
+   - Click on "Create New App" and select "From Scratch."
+   - Give your app a name and select your workspace.
+
+4. **Add Permissions (Scopes)**
+   - Under the "OAuth & Permissions" section, scroll down to "Scopes."
+   - Add the following scopes:
+     - `chat:write`
+     - `chat:write.public`
+
+5. **Install the App to Your Workspace**
+   - Click on "Install App to Workspace."
+   - This will provide you with a **Bot User OAuth Token**.
+
+6. **Add the Token to Airflow Connections**
+   - In your Airflow UI, navigate to the "Connections" section.
+   - Create a new connection with the following details:
+     - **Connection Type:** Slack API
+     - **Password:** Paste your Bot User OAuth Token here.
+
+## Conclusion
+
+After completing these steps, Airflow tasks should be able to send notifications to your Slack workspace using the configured connection.
 
 
