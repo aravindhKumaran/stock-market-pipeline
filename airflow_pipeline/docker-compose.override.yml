@@ -1,6 +1,10 @@
 version: "3.1"
 services:
 
+  postgres:
+    networks:
+      - ndsnet
+
   webserver:
     networks:
       - ndsnet
