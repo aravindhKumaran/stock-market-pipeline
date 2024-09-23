@@ -13,7 +13,7 @@ This project showcases a robust ETL (Extract, Transform, Load) pipeline built us
 - **ETL Pipeline with Airflow:** The heart of the project is an Airflow-managed ETL pipeline that orchestrates the entire data flow—from fetching raw stock data to loading transformed data into a data warehouse.
 - **Data Storage with MinIO:** MinIO serves as the object storage solution, holding the raw and processed data securely in a scalable environment.
 - **Data Transformation with Spark:** The data is processed and transformed using Apache Spark, allowing for scalable and efficient data manipulation.
-- **Data Warehousing in PostgreSQL:**Transformed data is stored in PostgreSQL as the data warehouse, providing a platform for fast querying and analysis.
+- **Data Warehousing in PostgreSQL:** Transformed data is stored in PostgreSQL as the data warehouse, providing a platform for fast querying and analysis.
 - **Dashboard with Metabase:** The final output is visualized through a dashboard created in Metabase, allowing for insights into stock market trends and performance.
 
 ## Tools and Technologies:
