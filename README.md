@@ -5,7 +5,7 @@ Welcome to Astronomer! This project was generated after you ran 'astro dev init'
 
 Dashboard:
 ==========
-![Stock Market Analysis](include/dashboard/stock-market-analysis.png)
+![Stock Market Analysis](airflow_pipeline/include/dashboard/stock-market-analysis.png)
 
 Project Contents
 ================
