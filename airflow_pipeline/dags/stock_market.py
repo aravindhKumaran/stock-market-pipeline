@@ -7,6 +7,7 @@ from airflow.models import TaskInstance
 from astro import sql as aql
 from astro.files import File
 from astro.sql.table import Table, Metadata
+from airflow.providers.slack.notifications.slack_notifier import SlackNotifier
 
 from datetime import datetime 
 import requests 
@@ -19,7 +20,17 @@ SYMBOL = "AAPL"
     start_date = datetime(2023,1,1),
     schedule = '@daily',
     catchup = False,
-    tags = ['stock_market']
+    tags = ['stock_market'],
+    on_success_callback = SlackNotifier(
+        slack_conn_id = 'slack',
+        text = 'The Dag stock_market has succeded',
+        channel = 'airflow-pipelines'
+    ),
+    on_failure_callback = SlackNotifier(
+        slack_conn_id = 'slack',
+        text = 'The Dag stock_market has failed',
+        channel = 'airflow-pipelines'
+    )
 )
 
 def stock_market():
@@ -76,7 +87,6 @@ def stock_market():
 
     load_to_dw = aql.load_file(
         task_id = 'load_to_dw',
-        #input_file = File(path = f"s3://{BUCKET_NAME}/{{ task_instance.xcom_pull(task_ids='get_formatted_csv') }}", conn_id = 'minio'), 
         input_file = File(
             path = f"s3://{BUCKET_NAME}/{{{{ task_instance.xcom_pull(task_ids='get_formatted_csv') }}}}", 
             conn_id='minio'
